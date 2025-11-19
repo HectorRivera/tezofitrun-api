@@ -1,0 +1,27 @@
+{
+  "name": "tezofitrun-api",
+  "version": "1.0.0",
+  "description": "TezoFitRun coaching API with WebSocket support",
+  "main": "src/handlers/heartRate.js",
+  "scripts": {
+    "deploy": "serverless deploy",
+    "local": "serverless offline",
+    "logs": "serverless logs -f heartRate -t",
+    "remove": "serverless remove"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1490.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.3.0"
+  },
+  "keywords": [
+    "fitness",
+    "coaching",
+    "heart-rate",
+    "websocket",
+    "aws",
+    "lambda"
+  ]
+}

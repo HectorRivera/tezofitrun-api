@@ -1,0 +1,74 @@
+service: tezofitrun-api
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: us-east-1
+  stage: ${opt:stage, 'dev'}
+  environment:
+    STAGE: ${self:provider.stage}
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+
+functions:
+  # Basic API endpoint for heart rate data
+  heartRate:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /heartrate
+          method: post
+          cors: true
+
+  # WebSocket connection handlers
+  connect:
+    handler: src/handlers/websocket.connect
+    events:
+      - websocket:
+          route: $connect
+          
+  disconnect:
+    handler: src/handlers/websocket.disconnect
+    events:
+      - websocket:
+          route: $disconnect
+          
+  default:
+    handler: src/handlers/websocket.default
+    events:
+      - websocket:
+          route: $default
+
+  # Heart rate WebSocket route
+  sendHeartRate:
+    handler: src/handlers/websocket.sendHeartRate
+    events:
+      - websocket:
+          route: sendHeartRate
+
+  # Coach instruction WebSocket route
+  coachInstruction:
+    handler: src/handlers/websocket.coachInstruction
+    events:
+      - websocket:
+          route: coachInstruction
+
+  # Sampling interval update route
+  updateSampling:
+    handler: src/handlers/websocket.updateSampling
+    events:
+      - websocket:
+          route: updateSampling
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    websocketPort: 3001
