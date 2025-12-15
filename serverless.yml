@@ -7,6 +7,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     STAGE: ${self:provider.stage}
+    DATABASE_URL: postgresql://tezofitrun:YJDJK_hjsj!$^$>>98@localhost:5432/tezofitrun
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -72,6 +73,38 @@ functions:
       - http:
           path: /user/preferences/{userId}
           method: get
+          cors: true
+
+  createSession:
+    handler: src/handlers/sessionManagement.createSession
+    events:
+      - http:
+          path: /session/create
+          method: post
+          cors: true
+
+  getAvailableSessions:
+    handler: src/handlers/sessionManagement.getAvailableSessions
+    events:
+      - http:
+          path: /session/available/{userId}
+          method: get
+          cors: true
+
+  startSession:
+    handler: src/handlers/sessionManagement.startSession
+    events:
+      - http:
+          path: /session/{sessionId}/start
+          method: post
+          cors: true
+
+  endSession:
+    handler: src/handlers/sessionManagement.endSession
+    events:
+      - http:
+          path: /session/{sessionId}/end
+          method: post
           cors: true
 
 plugins:

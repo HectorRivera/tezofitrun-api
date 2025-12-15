@@ -76,3 +76,5 @@ yarn-error.log
 
 #previous builds
 /v1/
+#environment
+.env

@@ -40,6 +40,7 @@ exports.handler = async (event) => {
           : {
               coaches: [
                 { id: "coach-123", name: "Coach Hector", status: "active" },
+                { id: "coach-456", name: "Coach John", status: "active" },
               ],
             },
       pendingInvitations: [

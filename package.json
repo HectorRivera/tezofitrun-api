@@ -10,7 +10,8 @@
     "remove": "serverless remove"
   },
   "dependencies": {
-    "aws-sdk": "^2.1490.0"
+    "aws-sdk": "^2.1490.0",
+    "pg": "^8.16.3"
   },
   "devDependencies": {
     "serverless": "^3.38.0",
