@@ -10,6 +10,33 @@ pool.on("connect", () => {
 });
 
 let connectedCoaches = [];
+let allConnections = []; // Instead of just connectedCoaches
+
+const addConnection = async (connectionId, userType = "unknown") => {
+  try {
+    await pool.query(
+      "INSERT INTO websocket_connections (connection_id, user_type) VALUES ($1, $2) ON CONFLICT (connection_id) DO UPDATE SET last_seen = CURRENT_TIMESTAMP",
+      [connectionId, userType]
+    );
+    console.log(`➕ ${userType} connected to DB: ${connectionId}`);
+  } catch (error) {
+    console.error("Error adding connection:", error);
+  }
+};
+const getAllConnections = async () => {
+  try {
+    const result = await pool.query(
+      "SELECT connection_id FROM websocket_connections"
+    );
+    const connections = result.rows.map((row) => row.connection_id);
+    console.log(`🔍 Found ${connections.length} total connections in DB`);
+    return connections;
+  } catch (error) {
+    console.error("Error getting all connections:", error);
+    return [];
+  }
+};
+
 const addCoachConnection = async (connectionId) => {
   try {
     await pool.query(
@@ -22,15 +49,15 @@ const addCoachConnection = async (connectionId) => {
   }
 };
 
-const removeCoachConnection = async (connectionId) => {
+const removeConnection = async (connectionId) => {
   try {
     const result = await pool.query(
       "DELETE FROM websocket_connections WHERE connection_id = $1",
       [connectionId]
     );
-    console.log(`➖ Coach disconnected from DB: ${connectionId}`);
+    console.log(`➖ Connection removed from DB: ${connectionId}`);
   } catch (error) {
-    console.error("Error removing coach connection:", error);
+    console.error("Error removing connection:", error);
   }
 };
 
@@ -55,11 +82,12 @@ exports.connect = async (event) => {
   const connectionId = event.requestContext.connectionId;
   console.log("Connection ID:", connectionId);
 
-  await addCoachConnection(connectionId);
+  // For now, default to 'athlete' - we can make this smarter later
+  await addConnection(connectionId, "athlete");
 
   return {
     statusCode: 200,
-    body: JSON.stringify({ message: "Coach connected successfully" }),
+    body: JSON.stringify({ message: "Connection established", connectionId }),
   };
 };
 
@@ -68,13 +96,14 @@ exports.disconnect = async (event) => {
   console.log("=== WEBSOCKET DISCONNECT ===");
   const connectionId = event.requestContext.connectionId;
 
-  await removeCoachConnection(connectionId);
+  await removeConnection(connectionId);
 
   return {
     statusCode: 200,
     body: JSON.stringify({ message: "Disconnected successfully" }),
   };
 };
+
 // Default WebSocket message handler
 exports.default = async (event) => {
   console.log("=== WEBSOCKET DEFAULT MESSAGE ===");
@@ -197,4 +226,5 @@ exports.updateSampling = async (event) => {
 // Export functions for heartRate handler to use
 exports.getConnectedCoaches = getConnectedCoaches;
 exports.addCoachConnection = addCoachConnection;
-exports.removeCoachConnection = removeCoachConnection;
+exports.removeCoachConnection = removeConnection;
+exports.getAllConnections = getAllConnections;

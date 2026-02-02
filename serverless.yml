@@ -17,7 +17,7 @@ provider:
       Resource: "*"
 
 functions:
-  # Basic API endpoint for heart rate data
+  # Basic API endpoint for heart rate data (existing)
   heartRate:
     handler: src/handlers/heartRate.handler
     events:
@@ -26,7 +26,48 @@ functions:
           method: post
           cors: true
 
-  # WebSocket connection handlers
+  # NEW: Heart Rate Capture Management Endpoints
+  startHeartRateCapture:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /session/{sessionId}/heartrate/capture/start
+          method: post
+          cors: true
+
+  pauseHeartRateCapture:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /session/{sessionId}/heartrate/capture/pause
+          method: post
+          cors: true
+
+  resumeHeartRateCapture:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /session/{sessionId}/heartrate/capture/resume
+          method: post
+          cors: true
+
+  getCurrentHeartRateCapture:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /session/{sessionId}/heartrate/current
+          method: get
+          cors: true
+
+  storeHeartRateData:
+    handler: src/handlers/heartRate.handler
+    events:
+      - http:
+          path: /heartrate/data
+          method: post
+          cors: true
+
+  # WebSocket connection handlers (existing - unchanged)
   connect:
     handler: src/handlers/websocket.connect
     events:
@@ -45,28 +86,28 @@ functions:
       - websocket:
           route: $default
 
-  # Heart rate WebSocket route
+  # Heart rate WebSocket route (existing)
   sendHeartRate:
     handler: src/handlers/websocket.sendHeartRate
     events:
       - websocket:
           route: sendHeartRate
 
-  # Coach instruction WebSocket route
+  # Coach instruction WebSocket route (existing)
   coachInstruction:
     handler: src/handlers/websocket.coachInstruction
     events:
       - websocket:
           route: coachInstruction
 
-  # Sampling interval update route
+  # Sampling interval update route (existing)
   updateSampling:
     handler: src/handlers/websocket.updateSampling
     events:
       - websocket:
           route: updateSampling
 
-  # Get User Preferences
+  # Get User Preferences (existing)
   getUserPreferences:
     handler: src/handlers/userPreferences.handler
     events:
@@ -75,6 +116,7 @@ functions:
           method: get
           cors: true
 
+  # Session Management (existing - unchanged)
   createSession:
     handler: src/handlers/sessionManagement.createSession
     events:
@@ -104,6 +146,15 @@ functions:
     events:
       - http:
           path: /session/{sessionId}/end
+          method: post
+          cors: true
+
+  # Voice Instructions (existing)
+  sendVoiceInstruction:
+    handler: src/handlers/voiceInstructions.sendVoiceInstruction
+    events:
+      - http:
+          path: /voice-instruction
           method: post
           cors: true
 
